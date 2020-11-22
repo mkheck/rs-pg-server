@@ -31,6 +31,7 @@ class RSocketController {
     @NonNull
     private final PongFactory pongFactory;
 
+/*
     private final List<RSocketRequester> rsClients = new ArrayList<>();
     private RSocketRequester requester;
 
@@ -60,6 +61,7 @@ class RSocketController {
                 .log()
                 .subscribe();
     }
+*/
 
     @MessageMapping("reqresp")
     Pong reqResp(Ping ping) {
@@ -95,6 +97,14 @@ class RSocketController {
                 .doOnNext(ping -> System.out.println("Inbound Ping: " + ping.toString()))
                 .switchMap(ping -> Flux.interval(Duration.ofMillis(250))
                         .map(l -> pongFactory.createPong("Sending Pong")));
+    }
+
+    @MessageMapping("datafromclient")
+    Flux<?> bidirectionalButNotReally(Flux<Ping> pingFlux) {
+        return pingFlux.doOnSubscribe(ping -> System.out.println("Subscribed"))
+                .doOnNext(ping -> System.out.println(ping.toString()))
+                .switchMap(ping -> Flux.interval(Duration.ofMillis(250))
+                        .map(l -> Flux.empty()));
     }
 }
 
